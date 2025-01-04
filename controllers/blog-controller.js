@@ -169,6 +169,35 @@ const filteredCategory = async (req, res) => {
   }
 };
 
+const searchBlog = async (req, res) => {
+  try {
+    const { title } = req.query;
+
+    // Validate query
+    if (!title) {
+      return res.status(400).json({
+        message: "Title query parameter is required.",
+      });
+    }
+
+    // Search for blogs with partial matching and case-insensitivity
+    const blogs = await Blog.find({ title: { $regex: title, $options: "i" } }).populate("category");
+
+    // Respond with the found blogs
+    res.status(200).json({
+      success: true,
+      count: blogs.length,
+      blogs,
+    });
+  } catch (error) {
+    console.error("Error while searching blogs:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong! Please try again.",
+    });
+  }
+};
+
 module.exports = {
   getAllBlog,
   getSingleBlog,
@@ -176,4 +205,5 @@ module.exports = {
   deleteBlogs,
   updateBlog,
   filteredCategory,
+  searchBlog,
 };
