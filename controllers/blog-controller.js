@@ -1,4 +1,6 @@
+const mongoose = require("mongoose");
 const Blog = require("../modal/blog");
+const category = require("../modal/category");
 
 // get all blogs
 const getAllBlog = async (req, res) => {
@@ -54,7 +56,16 @@ const getSingleBlog = async (req, res) => {
 
 // Post blogs
 const postBlogs = async (req, res) => {
-  const newBlogFormData = req.body;
+  const newBlogFormData = {
+    ...req.body,
+    image: `http://localhost:3000/uploads/${req.file.filename}`,
+    category: req.body.category ? JSON.parse(req.body.category) : [],
+  };
+
+  // Parse and validate the category field
+  if (!Array.isArray(newBlogFormData?.category) || !newBlogFormData?.category.every((id) => mongoose.Types.ObjectId.isValid(id))) {
+    return res.status(400).json({ error: "Invalid category IDs provided" });
+  }
 
   if (!newBlogFormData.title && !newBlogFormData.shortDescription && !newBlogFormData.longDescription) {
     console.error("Required fields are missing!");

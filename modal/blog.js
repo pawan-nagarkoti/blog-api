@@ -24,6 +24,10 @@ const BlogSchema = new mongoose.Schema({
     trim: true,
   },
   category: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }], // Reference to categories collection
+  image: {
+    type: String,
+    trim: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
